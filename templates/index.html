@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Script Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ Podcast Script Generator</h1>
+            <p class="subtitle">Transform any content into engaging podcast scripts</p>
+        </header>
+
+        <main>
+            <div class="card">
+                <form id="scriptForm">
+                    <!-- Source Input -->
+                    <div class="form-group">
+                        <label for="source">Content Source</label>
+                        <textarea 
+                            id="source" 
+                            name="source" 
+                            rows="6" 
+                            placeholder="Paste text, URL, or file path..."
+                            required
+                        ></textarea>
+                        <small>Enter text content, a URL, or paste from your clipboard</small>
+                    </div>
+
+                    <!-- Podcast Details -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="podcast_name">Podcast Name</label>
+                            <input 
+                                type="text" 
+                                id="podcast_name" 
+                                name="podcast_name" 
+                                value="My Podcast"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="host_name">Host Name</label>
+                            <input 
+                                type="text" 
+                                id="host_name" 
+                                name="host_name" 
+                                value="Your Name"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Advanced Options -->
+                    <details class="advanced-options">
+                        <summary>Advanced Options</summary>
+                        <div class="options-content">
+                            <div class="form-group">
+                                <label for="max_concepts">Max Concepts (8-20)</label>
+                                <input 
+                                    type="number" 
+                                    id="max_concepts" 
+                                    name="max_concepts" 
+                                    value="12" 
+                                    min="8" 
+                                    max="20"
+                                >
+                            </div>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="skip_elaborate" name="skip_elaborate">
+                                    Skip Elaboration (faster, shorter script)
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="skip_polish" name="skip_polish">
+                                    Skip Polishing (faster)
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-primary" id="generateBtn">
+                        <span class="btn-text">Generate Script</span>
+                        <span class="spinner" style="display: none;">⏳</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progressSection" class="card" style="display: none;">
+                <div class="progress-container">
+                    <h3>Generating Your Script...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressText">Starting analysis...</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="card" style="display: none;">
+                <div class="results-header">
+                    <h2>✨ Your Podcast Script</h2>
+                    <div class="results-actions">
+                        <button onclick="copyScript()" class="btn-secondary">📋 Copy</button>
+                        <button onclick="downloadScript()" class="btn-secondary">💾 Download</button>
+                    </div>
+                </div>
+                
+                <div class="metadata">
+                    <span id="wordCount"></span>
+                    <span id="duration"></span>
+                    <span id="concepts"></span>
+                </div>
+
+                <div class="script-container">
+                    <pre id="scriptOutput"></pre>
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="card error-card" style="display: none;">
+                <h3>❌ Error</h3>
+                <p id="errorMessage"></p>
+                <button onclick="hideError()" class="btn-secondary">Dismiss</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Gemini & DeepSeek AI</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

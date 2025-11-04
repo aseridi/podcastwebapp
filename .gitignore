@@ -1,0 +1,9 @@
+# Ignore environment variables
+.env
+
+# Ignore log files
+*.log
+
+# Ignore data and text files
+*.json
+*.txt
