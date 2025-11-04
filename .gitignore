@@ -7,3 +7,6 @@
 # Ignore data and text files
 *.json
 *.txt
+
+# Exception: Include requirements.txt (critical for deployment)
+!requirements.txt

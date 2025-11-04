@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Base paths
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # Go up to project root
 OUTPUT_DIR = BASE_DIR / "outputs"
 LOGS_DIR = BASE_DIR / "logs"
 
