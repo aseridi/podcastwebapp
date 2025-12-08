@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎙️ Podcast Script Generator</h1>
+            <h1>Podcast Script Generator</h1>
             <p class="subtitle">Transform any content into engaging podcast scripts</p>
         </header>
 
@@ -58,13 +58,13 @@
                         <summary>Advanced Options</summary>
                         <div class="options-content">
                             <div class="form-group">
-                                <label for="max_concepts">Max Concepts (8-20)</label>
+                                <label for="max_concepts">Max Concepts (5-20)</label>
                                 <input 
                                     type="number" 
                                     id="max_concepts" 
                                     name="max_concepts" 
                                     value="12" 
-                                    min="8" 
+                                    min="5" 
                                     max="20"
                                 >
                             </div>
@@ -84,7 +84,7 @@
                     <!-- Submit Button -->
                     <button type="submit" class="btn-primary" id="generateBtn">
                         <span class="btn-text">Generate Script</span>
-                        <span class="spinner" style="display: none;">⏳</span>
+                        <span class="spinner" style="display: none;"></span>
                     </button>
                 </form>
             </div>
@@ -103,10 +103,10 @@
             <!-- Results Section -->
             <div id="resultsSection" class="card" style="display: none;">
                 <div class="results-header">
-                    <h2>✨ Your Podcast Script</h2>
+                    <h2>Your Podcast Script</h2>
                     <div class="results-actions">
-                        <button onclick="copyScript()" class="btn-secondary">📋 Copy</button>
-                        <button onclick="downloadScript()" class="btn-secondary">💾 Download</button>
+                        <button onclick="copyScript()" class="btn-secondary">Copy</button>
+                        <button onclick="downloadScript()" class="btn-secondary">Download</button>
                     </div>
                 </div>
                 
@@ -119,11 +119,29 @@
                 <div class="script-container">
                     <pre id="scriptOutput"></pre>
                 </div>
+
+                <!-- Audio Generation Section -->
+                <div class="audio-generation-section">
+                    <h3>🔊 Generate Audio</h3>
+                    <div class="audio-controls">
+                        <div class="voice-selector">
+                            <label for="voiceSelect">Voice:</label>
+                            <select id="voiceSelect">
+                                <option value="Schedar">Schedar (Even)</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <button onclick="generateAudio()" class="btn-primary" id="audioBtn">
+                            Generate Audio
+                        </button>
+                    </div>
+                    <small>Convert your script to a spoken podcast using AI voices</small>
+                </div>
             </div>
 
             <!-- Error Section -->
             <div id="errorSection" class="card error-card" style="display: none;">
-                <h3>❌ Error</h3>
+                <h3>Error</h3>
                 <p id="errorMessage"></p>
                 <button onclick="hideError()" class="btn-secondary">Dismiss</button>
             </div>

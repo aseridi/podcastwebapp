@@ -22,7 +22,7 @@ class GeminiClient:
         self.model = genai.GenerativeModel(model)
         log.info(f"Gemini client initialized with model: {model}")
     
-    def generate(self, prompt: str, max_retries: int = 3, temperature: float = 0.7, **kwargs) -> Optional[str]:
+    def generate(self, prompt: str, max_retries: int = 3, temperature: float = 0.6, **kwargs) -> Optional[str]:
         """Generate text with retry logic"""
         
         # Create generation config for temperature and other parameters

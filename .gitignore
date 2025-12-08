@@ -10,3 +10,6 @@
 
 # Exception: Include requirements.txt (critical for deployment)
 !requirements.txt
+
+# extras
+extra/

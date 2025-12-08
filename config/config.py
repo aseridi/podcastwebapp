@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Base paths
-BASE_DIR = Path(__file__).resolve().parent.parent  # Go up to project root
+BASE_DIR = Path(__file__).resolve().parent.parent 
 OUTPUT_DIR = BASE_DIR / "outputs"
 LOGS_DIR = BASE_DIR / "logs"
 
@@ -35,7 +35,7 @@ API_CONFIG = {
 # Pipeline Configuration
 PIPELINE_CONFIG = {
     "max_concepts": 12,
-    "chunk_size": 2000,
+    "chunk_size": 2200,
     "min_chunk_size": 500,
     "temperature": 0.85,
     "max_tokens": 8192
