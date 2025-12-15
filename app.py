@@ -11,6 +11,7 @@ from datetime import datetime
 
 from config.config import API_KEYS, PIPELINE_CONFIG, OUTPUT_DIR, LOGS_DIR
 from app.core.pipeline import PodcastPipeline
+from app.core.tts_generator import TTSGenerator
 
 # Setup logging
 log_file = LOGS_DIR / f"app_{datetime.now().strftime('%Y%m%d')}.log"
@@ -41,6 +42,14 @@ try:
 except Exception as e:
     log.error(f"Failed to initialize pipeline: {e}")
     pipeline = None
+
+# Initialize TTS Generator
+try:
+    tts_generator = TTSGenerator(api_key=API_KEYS["google"])
+    log.info("TTS Generator initialized successfully")
+except Exception as e:
+    log.error(f"Failed to initialize TTS: {e}")
+    tts_generator = None
 
 
 @app.route('/')
@@ -98,6 +107,91 @@ def generate_script():
             "error": str(e)
         }), 500
 
+@app.route('/api/generate-audio', methods=['POST'])
+def generate_audio():
+    """Generate audio from script text"""
+    if not tts_generator:
+        return jsonify({
+            "success": False,
+            "error": "TTS not initialized. Check Google API key."
+        }), 500
+    
+    try:
+        data = request.get_json()
+        
+        # Get script text
+        script = data.get('script', '').strip()
+        if not script:
+            return jsonify({
+                "success": False,
+                "error": "Script text is required"
+            }), 400
+        
+        # Optional parameters
+        voice = data.get('voice', 'Schedar')
+        temperature = float(data.get('temperature', 1.0))
+        
+        # Ensure output directory exists
+        audio_output_dir = OUTPUT_DIR / "audio"
+        audio_output_dir.mkdir(parents=True, exist_ok=True)
+        
+        log.info(f"Generating audio for script ({len(script)} chars)...")
+        
+        # Generate audio
+        audio_path = tts_generator.generate_audio(
+            text=script,
+            output_path=audio_output_dir,
+            voice=voice,
+            temperature=temperature
+        )
+        
+        if not audio_path:
+            return jsonify({
+                "success": False,
+                "error": "Audio generation failed"
+            }), 500
+        
+        return jsonify({
+            "success": True,
+            "audio_file": str(audio_path),
+            "filename": audio_path.name,
+            "download_url": f"/api/download/audio/{audio_path.name}"
+        })
+        
+    except Exception as e:
+        log.error(f"Error in generate-audio endpoint: {e}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+    
+
+@app.route('/api/download/audio/<filename>')
+def download_audio(filename):
+    """Download generated audio file"""
+    try:
+        file_path = OUTPUT_DIR / "audio" / filename
+        if not file_path.exists():
+            return jsonify({"error": "File not found"}), 404
+        
+        return send_file(
+            file_path,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='audio/wav'
+        )
+    except Exception as e:
+        log.error(f"Error downloading audio: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tts/voices')
+def get_voices():
+    """Get available TTS voices"""
+    if not tts_generator:
+        return jsonify({"voices": []})
+    
+    return jsonify({"voices": TTSGenerator.VOICES})
 
 @app.route('/api/download/<path:filename>')
 def download_file(filename):

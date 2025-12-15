@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Check API health
     checkHealth();
+    
+    // Load available TTS voices
+    loadVoices();
 });
 
 // Check API health
@@ -22,6 +25,23 @@ async function checkHealth() {
         }
     } catch (error) {
         console.error('Health check failed:', error);
+    }
+}
+
+// Load available voices
+async function loadVoices() {
+    try {
+        const response = await fetch('/api/tts/voices');
+        const data = await response.json();
+        
+        const voiceSelect = document.getElementById('voiceSelect');
+        if (voiceSelect && data.voices && data.voices.length > 0) {
+            voiceSelect.innerHTML = data.voices
+                .map(v => `<option value="${v}" ${v === 'Schedar' ? 'selected' : ''}>${v}</option>`)
+                .join('');
+        }
+    } catch (error) {
+        console.error('Failed to load voices:', error);
     }
 }
 
@@ -48,6 +68,12 @@ async function handleSubmit(e) {
     // Hide previous results/errors
     hideError();
     document.getElementById('resultsSection').style.display = 'none';
+    
+    // Hide audio player if it exists
+    const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+    if (audioPlayerContainer) {
+        audioPlayerContainer.style.display = 'none';
+    }
     
     // Show progress
     showProgress();
@@ -127,12 +153,106 @@ function showResults(result) {
     
     // Populate metadata
     const metadata = result.metadata;
-    document.getElementById('wordCount').textContent = `📝 ${metadata.word_count} words`;
-    document.getElementById('duration').textContent = `⏱️ ${Math.round(metadata.duration_seconds)}s generation`;
-    document.getElementById('concepts').textContent = `💡 ${metadata.num_concepts} concepts`;
+    document.getElementById('wordCount').textContent = `${metadata.word_count} words`;
+    document.getElementById('duration').textContent = `${Math.round(metadata.duration_seconds)}s generation`;
+    document.getElementById('concepts').textContent = `${metadata.num_concepts} concepts`;
     
     // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Generate audio from script
+async function generateAudio() {
+    if (!currentScriptData || !currentScriptData.script) {
+        showError('No script available. Generate a script first.');
+        return;
+    }
+    
+    const audioBtn = document.getElementById('audioBtn');
+    const originalText = audioBtn.textContent;
+    
+    // Get selected voice
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voice = voiceSelect ? voiceSelect.value : 'Schedar';
+    
+    try {
+        // Update button state
+        audioBtn.disabled = true;
+        audioBtn.textContent = '🔊 Generating Audio...';
+        
+        const response = await fetch('/api/generate-audio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                script: currentScriptData.script,
+                voice: voice,
+                temperature: 1.0
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Audio generation failed');
+        }
+        
+        // Show audio player
+        showAudioPlayer(result.download_url, result.filename);
+        
+        // Visual feedback
+        audioBtn.textContent = 'Audio Ready!';
+        audioBtn.style.background = '#10b981';
+        
+        setTimeout(() => {
+            audioBtn.textContent = originalText;
+            audioBtn.style.background = '';
+            audioBtn.disabled = false;
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Audio generation error:', error);
+        showError(error.message || 'Failed to generate audio');
+        audioBtn.textContent = originalText;
+        audioBtn.disabled = false;
+    }
+}
+
+// Show audio player
+function showAudioPlayer(url, filename) {
+    // Check if player already exists
+    let playerContainer = document.getElementById('audioPlayerContainer');
+    
+    if (!playerContainer) {
+        // Create player container
+        playerContainer = document.createElement('div');
+        playerContainer.id = 'audioPlayerContainer';
+        playerContainer.className = 'audio-player-container';
+        playerContainer.innerHTML = `
+            <h4>🎧 Generated Audio</h4>
+            <audio id="audioPlayer" controls style="width: 100%; margin: 1rem 0;"></audio>
+            <div class="audio-actions">
+                <a id="audioDownloadLink" class="btn-secondary" download>Download Audio</a>
+            </div>
+        `;
+        
+        // Insert after metadata
+        const metadata = document.querySelector('.metadata');
+        if (metadata) {
+            metadata.parentNode.insertBefore(playerContainer, metadata.nextSibling);
+        }
+    }
+    
+    // Update player source
+    const audioPlayer = document.getElementById('audioPlayer');
+    const downloadLink = document.getElementById('audioDownloadLink');
+    
+    audioPlayer.src = url;
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    
+    playerContainer.style.display = 'block';
 }
 
 // Copy script to clipboard
@@ -145,7 +265,7 @@ async function copyScript() {
         // Visual feedback
         const btn = event.target;
         const originalText = btn.textContent;
-        btn.textContent = '✅ Copied!';
+        btn.textContent = 'Copied!';
         btn.style.background = '#10b981';
         
         setTimeout(() => {

@@ -9,6 +9,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from pathlib import Path
+import trafilatura
 from typing import Optional, Dict, Any, List
 from .api_clients import GeminiClient, DeepSeekClient
 
@@ -24,33 +25,44 @@ class TextAnalyzer:
     
     def load_content(self, source: str) -> Optional[str]:
         """Load content from file, URL, or direct text"""
-        # Check if it's a URL
+    # Check if it's a URL
         if source.startswith(('http://', 'https://')):
             return self._fetch_url(source)
         
         # Check if it's a file path
-        path = Path(source)
-        if path.exists() and path.is_file():
-            return self._read_file(path)
+        if len(source) <= 260 and '\n' not in source:
+            try:
+                path = Path(source)
+                if path.exists() and path.is_file():
+                    return self._read_file(path)
+            except OSError:
+                # Path too long or invalid - treat as direct text
+                pass
         
         # Treat as direct text
         return source.strip() if source.strip() else None
     
     def _fetch_url(self, url: str) -> Optional[str]:
-        """Fetch and extract text from URL"""
+        """Fetch and extract clean article text using Trafilatura."""
         try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
+            # download() handles headers, user-agents, and timeouts automatically
+            downloaded = trafilatura.fetch_url(url)
             
-            # Remove script and style elements
-            for element in soup(['script', 'style', 'nav', 'footer']):
-                element.decompose()
+            if downloaded is None:
+                log.warning(f"Empty response from {url}")
+                return None
+
+            # extract() uses heuristics to find the main content
+            text = trafilatura.extract(
+                downloaded, 
+                include_comments=False, 
+                include_tables=False, 
+                no_fallback=False
+            )
             
-            text = soup.get_text(separator='\n', strip=True)
             return text
         except Exception as e:
-            log.error(f"Failed to fetch URL {url}: {e}")
+            log.error(f"Failed to fetch/parse URL {url}: {e}")
             return None
     
     def _read_file(self, path: Path) -> Optional[str]:
