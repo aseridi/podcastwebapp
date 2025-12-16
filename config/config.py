@@ -21,7 +21,8 @@ LOGS_DIR.mkdir(exist_ok=True)
 # API Configuration
 API_KEYS = {
     "google": os.getenv("GOOGLE_API_KEY"),
-    "deepseek": os.getenv("DEEPSEEK_KEY")
+    "deepseek": os.getenv("DEEPSEEK_KEY"),
+    "google_tts" : os.getenv("GOOGLE_TTS_API_KEY"),
 }
 
 API_CONFIG = {

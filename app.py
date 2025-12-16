@@ -45,7 +45,7 @@ except Exception as e:
 
 # Initialize TTS Generator
 try:
-    tts_generator = TTSGenerator(api_key=API_KEYS["google"])
+    tts_generator = TTSGenerator(api_key=API_KEYS["google_tts"])
     log.info("TTS Generator initialized successfully")
 except Exception as e:
     log.error(f"Failed to initialize TTS: {e}")
