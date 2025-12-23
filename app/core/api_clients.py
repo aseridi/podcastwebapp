@@ -55,9 +55,20 @@ class DeepSeekClient:
         if not api_key:
             raise ValueError("DeepSeek API key is required")
         
-        self.client = OpenAI(api_key=api_key, base_url=base_url)
-        self.model = model
-        log.info(f"DeepSeek client initialized with model: {model}")
+        # Create client with explicit parameters only
+        # This avoids issues with unexpected kwargs like 'proxies'
+        try:
+            self.client = OpenAI(
+                api_key=api_key,
+                base_url=base_url,
+                timeout=120.0,
+                max_retries=2
+            )
+            self.model = model
+            log.info(f"DeepSeek client initialized with model: {model}")
+        except Exception as e:
+            log.error(f"Failed to initialize DeepSeek client: {e}")
+            raise
     
     def generate(self, prompt: str, max_tokens: int = 8192, 
                  temperature: float = 0.85, max_retries: int = 3, **kwargs) -> Optional[str]:
