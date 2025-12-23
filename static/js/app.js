@@ -4,9 +4,6 @@ let currentScriptData = null;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('scriptForm');
-    form.addEventListener('submit', handleSubmit);
-    
     // Check API health
     checkHealth();
     
@@ -45,18 +42,16 @@ async function loadVoices() {
     }
 }
 
-// Handle form submission
-async function handleSubmit(e) {
-    e.preventDefault();
-    
+// Handle script generation
+async function handleGenerateScript() {
     // Get form data
     const formData = {
         source: document.getElementById('source').value.trim(),
         podcast_name: document.getElementById('podcast_name').value.trim(),
         host_name: document.getElementById('host_name').value.trim(),
         max_concepts: parseInt(document.getElementById('max_concepts').value),
-        skip_elaborate: document.getElementById('skip_elaborate').checked,
-        skip_polish: document.getElementById('skip_polish').checked
+        skip_elaborate: false,
+        skip_polish: false
     };
     
     // Validate
@@ -78,11 +73,13 @@ async function handleSubmit(e) {
     // Show progress
     showProgress();
     
-    // Disable form
-    const generateBtn = document.getElementById('generateBtn');
-    generateBtn.disabled = true;
-    generateBtn.querySelector('.btn-text').textContent = 'Generating...';
-    generateBtn.querySelector('.spinner').style.display = 'inline-block';
+    // Disable both buttons
+    const scriptBtn = document.getElementById('scriptBtn');
+    const audioBtn = document.getElementById('audioBtn');
+    scriptBtn.disabled = true;
+    audioBtn.disabled = true;
+    scriptBtn.querySelector('.btn-text').textContent = 'Generating...';
+    scriptBtn.querySelector('.spinner').style.display = 'inline-block';
     
     try {
         // Simulate progress updates
@@ -118,10 +115,80 @@ async function handleSubmit(e) {
         showError(error.message || 'Failed to generate script. Please try again.');
         document.getElementById('progressSection').style.display = 'none';
     } finally {
-        // Re-enable form
-        generateBtn.disabled = false;
-        generateBtn.querySelector('.btn-text').textContent = 'Generate Script';
-        generateBtn.querySelector('.spinner').style.display = 'none';
+        // Re-enable both buttons
+        scriptBtn.disabled = false;
+        audioBtn.disabled = false;
+        scriptBtn.querySelector('.btn-text').textContent = 'Generate Script';
+        scriptBtn.querySelector('.spinner').style.display = 'none';
+    }
+}
+
+// Handle audio-only generation (no script needed)
+async function handleGenerateAudio() {
+    // Get text from source field
+    const sourceText = document.getElementById('source').value.trim();
+    
+    // Validate
+    if (!sourceText) {
+        showError('Please enter text to convert to audio');
+        return;
+    }
+    
+    // Hide errors
+    hideError();
+    
+    // Get selected voice
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voice = voiceSelect ? voiceSelect.value : 'Schedar';
+    
+    // Disable both buttons
+    const scriptBtn = document.getElementById('scriptBtn');
+    const audioBtn = document.getElementById('audioBtn');
+    const originalText = audioBtn.textContent;
+    
+    scriptBtn.disabled = true;
+    audioBtn.disabled = true;
+    audioBtn.textContent = '🔊 Generating Audio...';
+    
+    try {
+        const response = await fetch('/api/generate-audio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                script: sourceText,
+                voice: voice,
+                temperature: 1.0
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Audio generation failed');
+        }
+        
+        // Show audio player
+        showAudioPlayer(result.download_url, result.filename);
+        
+        // Visual feedback
+        audioBtn.textContent = '✅ Audio Ready!';
+        audioBtn.style.background = '#10b981';
+        
+        setTimeout(() => {
+            audioBtn.textContent = originalText;
+            audioBtn.style.background = '';
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Audio generation error:', error);
+        showError(error.message || 'Failed to generate audio');
+        audioBtn.textContent = originalText;
+    } finally {
+        // Re-enable both buttons
+        scriptBtn.disabled = false;
+        audioBtn.disabled = false;
     }
 }
 
@@ -161,14 +228,14 @@ function showResults(result) {
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Generate audio from script
-async function generateAudio() {
+// Generate audio from existing script (called from results section)
+async function generateAudioFromScript() {
     if (!currentScriptData || !currentScriptData.script) {
         showError('No script available. Generate a script first.');
         return;
     }
     
-    const audioBtn = document.getElementById('audioBtn');
+    const audioBtn = document.getElementById('audioFromScriptBtn');
     const originalText = audioBtn.textContent;
     
     // Get selected voice
@@ -237,10 +304,10 @@ function showAudioPlayer(url, filename) {
             </div>
         `;
         
-        // Insert after metadata
-        const metadata = document.querySelector('.metadata');
-        if (metadata) {
-            metadata.parentNode.insertBefore(playerContainer, metadata.nextSibling);
+        // Insert after form card or at top of results
+        const mainCard = document.querySelector('.card');
+        if (mainCard && mainCard.nextSibling) {
+            mainCard.parentNode.insertBefore(playerContainer, mainCard.nextSibling);
         }
     }
     
@@ -253,6 +320,9 @@ function showAudioPlayer(url, filename) {
     downloadLink.download = filename;
     
     playerContainer.style.display = 'block';
+    
+    // Scroll to player
+    playerContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 // Copy script to clipboard

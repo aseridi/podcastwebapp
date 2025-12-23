@@ -68,24 +68,20 @@
                                     max="20"
                                 >
                             </div>
-                            <div class="checkbox-group">
-                                <label>
-                                    <input type="checkbox" id="skip_elaborate" name="skip_elaborate">
-                                    Skip Elaboration (faster, shorter script)
-                                </label>
-                                <label>
-                                    <input type="checkbox" id="skip_polish" name="skip_polish">
-                                    Skip Polishing (faster)
-                                </label>
-                            </div>
                         </div>
                     </details>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn-primary" id="generateBtn">
-                        <span class="btn-text">Generate Script</span>
-                        <span class="spinner" style="display: none;"></span>
-                    </button>
+                     <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button type="button" class="btn-primary" id="scriptBtn" onclick="handleGenerateScript()">
+                            <span class="btn-text">Generate Script</span>
+                            <span class="spinner" style="display: none;">⏳</span>
+                        </button>
+                        <button type="button" class="btn-primary" id="audioBtn" onclick="handleGenerateAudio()">
+                            <span class="btn-text">Generate Audio</span>
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -131,8 +127,8 @@
                                 <!-- Options populated by JS -->
                             </select>
                         </div>
-                        <button onclick="generateAudio()" class="btn-primary" id="audioBtn">
-                            Generate Audio
+                        <button onclick="generateAudioFromScript()" class="btn-primary" id="audioFromScriptBtn">
+                            Generate Audio from Script
                         </button>
                     </div>
                     <small>Convert your script to a spoken podcast using AI voices</small>
@@ -148,7 +144,7 @@
         </main>
 
         <footer>
-            <p>Powered by Gemini & DeepSeek AI</p>
+            <p>Powered by DeepSeek & Gemini AI</p>
         </footer>
     </div>
 

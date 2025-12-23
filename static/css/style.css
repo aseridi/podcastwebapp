@@ -1,9 +1,9 @@
 /* Modern Podcast Script Generator Styles */
 
 :root {
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --secondary: #10b981;
+    --primary: #272863;
+    --primary-dark: #373379;
+    --secondary: #137e5a;
     --success: #10b981;
     --danger: #ef4444;
     --dark: #1f2937;
@@ -23,7 +23,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3c4b8f 0%, #412d55 100%);
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
@@ -56,7 +56,7 @@ header h1 {
 
 /* Card */
 .card {
-    background: white;
+    background: rgb(234, 234, 234);
     border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
@@ -426,4 +426,16 @@ footer {
     .voice-selector {
         width: 100%;
     }
+}
+
+/* Button Group - Side by side buttons */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.button-group .btn-primary {
+    flex: 1;
+    width: auto;
 }

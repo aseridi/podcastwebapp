@@ -129,7 +129,7 @@ def generate_audio():
         
         # Optional parameters
         voice = data.get('voice', 'Schedar')
-        temperature = float(data.get('temperature', 1.0))
+        temperature = float(data.get('temperature', 1.1))
         
         # Ensure output directory exists
         audio_output_dir = OUTPUT_DIR / "audio"
