@@ -12,6 +12,7 @@ google-genai==1.47.0
 requests==2.31.0
 beautifulsoup4==4.12.3
 trafilatura==2.0.0
+lxml_html_clean==0.4.1
 
 # Utilities
 python-dotenv==1.0.0
