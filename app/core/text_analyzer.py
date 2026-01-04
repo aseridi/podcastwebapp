@@ -185,7 +185,7 @@ KEY CONCEPTS: {", ".join(concept_names)}
 CONTENT PREVIEW:
 {text[:6000]}
 
-Create an outline with 3-4 sections. For each section provide:
+Create an outline with 5-8 sections. For each section provide:
 - section_number: Number (1, 2, 3...)
 - title: Short section title
 - focus: What this section covers (2-3 sentences)

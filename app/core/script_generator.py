@@ -42,7 +42,7 @@ Write this section in a natural, conversational tone as if you're speaking direc
 - Use first person ("I want to talk about...")
 - Include specific examples and details from the source material
 - Make it engaging with analogies, questions, or stories
-- This should be 300-500 words
+- This should be 1500-2500 words
 - Flow naturally but stay focused on this section's topic
 
 Write ONLY this section, not the entire episode."""

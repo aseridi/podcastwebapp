@@ -71,7 +71,7 @@ class TTSGenerator:
         text: str,
         output_path: Path,
         voice: str = "Schedar",
-        temperature: float = 1.0
+        temperature: float = 0.87
     ) -> Optional[Path]:
         """Generate audio from text
         
