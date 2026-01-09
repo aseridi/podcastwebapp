@@ -81,18 +81,18 @@ def generate_script():
         # Get optional parameters
         podcast_name = data.get('podcast_name', 'My Podcast').strip()
         host_name = data.get('host_name', 'Your Name').strip()
-        max_concepts = int(data.get('max_concepts', PIPELINE_CONFIG['max_concepts']))
+        max_chapters = int(data.get('max_chapters', PIPELINE_CONFIG['max_chapters']))
         skip_elaborate = data.get('skip_elaborate', False)
         skip_polish = data.get('skip_polish', False)
-        
+
         log.info(f"Generating script for: {source[:100]}...")
-        
+
         # Run pipeline
         result = pipeline.generate(
             source=source,
             podcast_name=podcast_name,
             host_name=host_name,
-            max_concepts=max_concepts,
+            max_chapters=max_chapters,
             skip_elaborate=skip_elaborate,
             skip_polish=skip_polish,
             save_intermediate=True

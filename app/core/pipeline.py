@@ -34,49 +34,49 @@ class PodcastPipeline:
         
         log.info("Pipeline initialized successfully")
     
-    def generate(self, 
+    def generate(self,
                 source: str,
                 podcast_name: str = "My Podcast",
                 host_name: str = "Host",
-                max_concepts: int = 12,
+                max_chapters: int = 20,  # Changed from max_concepts
                 skip_elaborate: bool = False,
                 skip_polish: bool = False,
                 save_intermediate: bool = True) -> Dict[str, Any]:
         """
-        Run complete pipeline from source to final script
-        
+        Run complete pipeline from book source to final script
+
         Args:
             source: File path, URL, or text content
             podcast_name: Name of the podcast
             host_name: Name of the host
-            max_concepts: Maximum number of concepts to analyze
+            max_chapters: Maximum number of chapters to analyze (changed from max_concepts)
             skip_elaborate: Skip elaboration step
             skip_polish: Skip polishing step
             save_intermediate: Save analysis JSON
-        
+
         Returns:
             Dictionary with script and metadata
         """
         log.info(f"Starting pipeline for: {source[:100]}...")
         start_time = datetime.now()
-        
+
         try:
             # Step 1: Analyze content
-            log.info("Step 1/2: Analyzing content...")
-            analysis = self.analyzer.process(source, max_concepts)
-            
+            log.info("Step 1/2: Analyzing book content...")
+            analysis = self.analyzer.process(source, max_chapters)
+
             if not analysis:
                 return {
                     "success": False,
                     "error": "Content analysis failed"
                 }
-            
+
             # Save analysis if requested
             if save_intermediate:
                 analysis_file = self.output_dir / "json" / f"analysis_{start_time.strftime('%Y%m%d_%H%M%S')}.json"
                 analysis_file.write_text(json.dumps(analysis, indent=2))
                 log.info(f"Analysis saved to: {analysis_file}")
-            
+
             # Step 2: Generate script
             log.info("Step 2/2: Generating script...")
             script = self.generator.generate_complete(
@@ -86,21 +86,21 @@ class PodcastPipeline:
                 skip_elaborate,
                 skip_polish
             )
-            
+
             if not script:
                 return {
                     "success": False,
                     "error": "Script generation failed"
                 }
-            
+
             # Save script
             script_file = self.output_dir / "scripts" / f"script_{start_time.strftime('%Y%m%d_%H%M%S')}.txt"
             script_file.write_text(script)
             log.info(f"Script saved to: {script_file}")
-            
+
             end_time = datetime.now()
             duration = (end_time - start_time).total_seconds()
-            
+
             result = {
                 "success": True,
                 "script": script,
@@ -113,14 +113,14 @@ class PodcastPipeline:
                     "duration_seconds": duration,
                     "script_length": len(script),
                     "word_count": len(script.split()),
-                    "num_concepts": len(analysis.get("concepts", [])),
+                    "num_chapters": len(analysis.get("ideas", [])),  # Changed to ideas
                     "timestamp": start_time.isoformat()
                 }
             }
-            
+
             log.info(f"Pipeline completed in {duration:.1f} seconds")
             return result
-            
+
         except Exception as e:
             log.error(f"Pipeline error: {e}", exc_info=True)
             return {

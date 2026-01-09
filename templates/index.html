@@ -58,15 +58,39 @@
                         <summary>Advanced Options</summary>
                         <div class="options-content">
                             <div class="form-group">
-                                <label for="max_concepts">Max Concepts (5-20)</label>
-                                <input 
-                                    type="number" 
-                                    id="max_concepts" 
-                                    name="max_concepts" 
-                                    value="12" 
-                                    min="5" 
+                                <label for="max_chapters">Max Chapters (5-20)</label>
+                                <input
+                                    type="number"
+                                    id="max_chapters"
+                                    name="max_chapters"
+                                    value="20"
+                                    min="5"
                                     max="20"
                                 >
+                            </div>
+
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        id="skip_elaborate"
+                                        name="skip_elaborate"
+                                    >
+                                    <span>Skip Elaborate Step</span>
+                                </label>
+                                <small>Skip the elaboration phase (faster, less detailed)</small>
+                            </div>
+
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        id="skip_polish"
+                                        name="skip_polish"
+                                    >
+                                    <span>Skip Polish Step</span>
+                                </label>
+                                <small>Skip the final polishing phase (faster, less refined)</small>
                             </div>
                         </div>
                     </details>

@@ -33,13 +33,14 @@ API_CONFIG = {
     "timeout": 120
 }
 
-# Pipeline Configuration
+# Pipeline Configuration for Books
 PIPELINE_CONFIG = {
-    "max_concepts": 12,
-    "chunk_size": 2200,
-    "min_chunk_size": 500,
+    "max_chapters": 20,        # Changed from max_concepts
+    "chunk_size": 3000,        # Larger chunks for books
+    "min_chunk_size": 1000,    # Larger minimum
     "temperature": 0.85,
-    "max_tokens": 8192
+    "max_tokens": 8192,
+    "section_word_target": 4000,  # Target 3000-5000 words per section
 }
 
 # Default podcast metadata

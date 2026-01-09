@@ -49,9 +49,9 @@ async function handleGenerateScript() {
         source: document.getElementById('source').value.trim(),
         podcast_name: document.getElementById('podcast_name').value.trim(),
         host_name: document.getElementById('host_name').value.trim(),
-        max_concepts: parseInt(document.getElementById('max_concepts').value),
-        skip_elaborate: false,
-        skip_polish: false
+        max_chapters: parseInt(document.getElementById('max_chapters').value),
+        skip_elaborate: document.getElementById('skip_elaborate').checked,
+        skip_polish: document.getElementById('skip_polish').checked
     };
     
     // Validate
@@ -222,7 +222,7 @@ function showResults(result) {
     const metadata = result.metadata;
     document.getElementById('wordCount').textContent = `${metadata.word_count} words`;
     document.getElementById('duration').textContent = `${Math.round(metadata.duration_seconds)}s generation`;
-    document.getElementById('concepts').textContent = `${metadata.num_concepts} concepts`;
+    document.getElementById('concepts').textContent = `${metadata.num_chapters} chapters`;
     
     // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
