@@ -189,26 +189,45 @@ Return only the polished transcript with no additional commentary or formatting:
 
 
     def clean_output(self, text: str) -> str:
-        """Remove unwanted formatting and meta-commentary"""
+        """Remove ALL unwanted formatting, stage directions, and meta-commentary"""
+        
+        # Remove section titles with formatting
+        text = re.sub(r'\*\*SECTION TITLE:.*?\*\*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\*\*Section \d+:.*?\*\*', '', text, flags=re.IGNORECASE)
+        
+        # Remove sound cues/directions in parentheses with asterisks
+        text = re.sub(r'\*\*\(.*?\)\*\*', '', text)
+        text = re.sub(r'\*\(.*?\)\*', '', text)
+        text = re.sub(r'\(SOUND.*?\)', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\(MUSIC.*?\)', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\(PAUSE.*?\)', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\(.*?FADES.*?\)', '', text, flags=re.IGNORECASE)
+        
+        # Remove speaker labels
+        text = re.sub(r'\*\*HOST:\*\*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\*\*Host\*\*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\*\*NARRATOR:\*\*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\*\*Narrator\*\*', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'^Host:', '', text, flags=re.MULTILINE | re.IGNORECASE)
         
         # Remove meta-commentary at start
         text = re.sub(r'^.*?Here is.*?(?:script|transcript|version).*?\n+', '', text, flags=re.IGNORECASE | re.DOTALL)
         
-        # Remove stage directions in parentheses or asterisks
-        text = re.sub(r'\*\*\(.*?\)\*\*', '', text)
-        text = re.sub(r'\(SOUND.*?\)', '', text, flags=re.IGNORECASE)
+        # Remove markdown headers (###, ##, #)
+        text = re.sub(r'^#{1,6}\s+.*$', '', text, flags=re.MULTILINE)
         
-        # Remove speaker labels
-        text = re.sub(r'\*\*HOST:\*\*|\*\*NARRATOR:\*\*', '', text, flags=re.IGNORECASE)
+        # Remove ALL asterisks (bold/italic formatting)
+        text = re.sub(r'\*+', '', text)
         
-        # Remove markdown headers
-        text = re.sub(r'###\s*', '', text)
+        # Remove brackets and stage directions
+        text = re.sub(r'\[.*?\]', '', text)
         
-        # Remove excessive asterisks
-        text = re.sub(r'\*{2,}', '', text)
-        
-        # Clean up multiple newlines
+        # Remove excessive newlines (more than 2)
         text = re.sub(r'\n{3,}', '\n\n', text)
+        
+        # Remove leading/trailing whitespace from each line
+        lines = [line.strip() for line in text.split('\n')]
+        text = '\n'.join(lines)
         
         return text.strip()
     
@@ -228,7 +247,6 @@ Return only the polished transcript with no additional commentary or formatting:
         
         log.info(f"Content generated: {len(content)} characters")
         
-        # Skip elaborate (we're not using it anymore)
         if skip_polish:
             return content
         
