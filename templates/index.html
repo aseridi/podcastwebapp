@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Podcast Script Generator</h1>
+            <h1>🎙️ Podcast Script Generator</h1>
             <p class="subtitle">Transform any content into engaging podcast scripts</p>
         </header>
 
@@ -58,27 +58,16 @@
                         <summary>Advanced Options</summary>
                         <div class="options-content">
                             <div class="form-group">
-                                <label for="max_chapters">Max Chapters (5-20)</label>
+                                <label for="max_passages">Max Key Passages (8-15)</label>
                                 <input
                                     type="number"
-                                    id="max_chapters"
-                                    name="max_chapters"
-                                    value="20"
-                                    min="5"
-                                    max="20"
+                                    id="max_passages"
+                                    name="max_passages"
+                                    value="12"
+                                    min="8"
+                                    max="15"
                                 >
-                            </div>
-
-                            <div class="form-group checkbox-group">
-                                <label class="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        id="skip_elaborate"
-                                        name="skip_elaborate"
-                                    >
-                                    <span>Skip Elaborate Step</span>
-                                </label>
-                                <small>Skip the elaboration phase (faster, less detailed)</small>
+                                <small>Number of critical quotes/analogies to extract from text</small>
                             </div>
 
                             <div class="form-group checkbox-group">
@@ -95,8 +84,7 @@
                         </div>
                     </details>
 
-                    <!-- Submit Button -->
-                     <!-- Action Buttons -->
+                    <!-- Action Buttons -->
                     <div class="button-group">
                         <button type="button" class="btn-primary" id="scriptBtn" onclick="handleGenerateScript()">
                             <span class="btn-text">Generate Script</span>
@@ -133,7 +121,7 @@
                 <div class="metadata">
                     <span id="wordCount"></span>
                     <span id="duration"></span>
-                    <span id="concepts"></span>
+                    <span id="framework"></span>
                 </div>
 
                 <div class="script-container">
@@ -168,7 +156,7 @@
         </main>
 
         <footer>
-            <p>Powered by DeepSeek & Gemini AI</p>
+            <p>Powered by DeepSeek & Gemini AI | Exploring Philosophical Frameworks</p>
         </footer>
     </div>
 

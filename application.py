@@ -1,5 +1,6 @@
 """
 Flask Web Application for Podcast Script Generator
+UPDATED: Changed max_chapters → max_passages parameter
 """
 
 import os
@@ -78,21 +79,21 @@ def generate_script():
                 "error": "Source content is required"
             }), 400
         
-        # Get optional parameters
+        # Get optional parameters - UPDATED: max_chapters → max_passages
         podcast_name = data.get('podcast_name', 'My Podcast').strip()
         host_name = data.get('host_name', 'Your Name').strip()
-        max_chapters = int(data.get('max_chapters', PIPELINE_CONFIG['max_chapters']))
+        max_passages = int(data.get('max_passages', PIPELINE_CONFIG['max_passages']))
         skip_elaborate = data.get('skip_elaborate', False)
         skip_polish = data.get('skip_polish', False)
 
         log.info(f"Generating script for: {source[:100]}...")
 
-        # Run pipeline
+        # Run pipeline - UPDATED: max_chapters → max_passages
         result = pipeline.generate(
             source=source,
             podcast_name=podcast_name,
             host_name=host_name,
-            max_chapters=max_chapters,
+            max_passages=max_passages,
             skip_elaborate=skip_elaborate,
             skip_polish=skip_polish,
             save_intermediate=True

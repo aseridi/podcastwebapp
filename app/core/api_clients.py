@@ -24,7 +24,11 @@ class GeminiClient:
     
     def generate(self, prompt: str, max_retries: int = 3, temperature: float = 0.6, **kwargs) -> Optional[str]:
         """Generate text with retry logic"""
-        
+
+        # Translate max_tokens to max_output_tokens for Gemini API
+        if 'max_tokens' in kwargs:
+            kwargs['max_output_tokens'] = kwargs.pop('max_tokens')
+
         # Create generation config for temperature and other parameters
         generation_config = genai.types.GenerationConfig(
             temperature=temperature,

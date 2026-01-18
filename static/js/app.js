@@ -1,4 +1,5 @@
 // Podcast Script Generator - Frontend JavaScript
+// UPDATED: Changed max_chapters → max_passages
 
 let currentScriptData = null;
 
@@ -44,13 +45,12 @@ async function loadVoices() {
 
 // Handle script generation
 async function handleGenerateScript() {
-    // Get form data
+    // Get form data - UPDATED: max_chapters → max_passages
     const formData = {
         source: document.getElementById('source').value.trim(),
         podcast_name: document.getElementById('podcast_name').value.trim(),
         host_name: document.getElementById('host_name').value.trim(),
-        max_chapters: parseInt(document.getElementById('max_chapters').value),
-        skip_elaborate: document.getElementById('skip_elaborate').checked,
+        max_passages: parseInt(document.getElementById('max_passages').value),
         skip_polish: document.getElementById('skip_polish').checked
     };
     
@@ -83,7 +83,7 @@ async function handleGenerateScript() {
     
     try {
         // Simulate progress updates
-        updateProgress(10, 'Analyzing content...');
+        updateProgress(10, 'Identifying philosophical framework...');
         
         // Call API
         const response = await fetch('/api/generate', {
@@ -94,11 +94,11 @@ async function handleGenerateScript() {
             body: JSON.stringify(formData)
         });
         
-        updateProgress(50, 'Generating draft script...');
+        updateProgress(50, 'Extracting key passages...');
         
         const result = await response.json();
         
-        updateProgress(90, 'Finalizing...');
+        updateProgress(90, 'Generating script...');
         
         if (!response.ok || !result.success) {
             throw new Error(result.error || 'Generation failed');
@@ -204,7 +204,7 @@ function updateProgress(percent, message) {
     document.getElementById('progressText').textContent = message;
 }
 
-// Show results
+// Show results - UPDATED: Display framework name instead of chapters
 function showResults(result) {
     currentScriptData = result;
     
@@ -218,11 +218,11 @@ function showResults(result) {
     // Populate script
     document.getElementById('scriptOutput').textContent = result.script;
     
-    // Populate metadata
+    // Populate metadata - UPDATED: Show framework instead of num_chapters
     const metadata = result.metadata;
-    document.getElementById('wordCount').textContent = `${metadata.word_count} words`;
+    document.getElementById('wordCount').textContent = `${metadata.word_count.toLocaleString()} words`;
     document.getElementById('duration').textContent = `${Math.round(metadata.duration_seconds)}s generation`;
-    document.getElementById('concepts').textContent = `${metadata.num_chapters} chapters`;
+    document.getElementById('framework').textContent = `Framework: ${metadata.framework_name || 'Unknown'}`;
     
     // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });

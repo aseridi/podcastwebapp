@@ -1,5 +1,6 @@
 """
-Streamlined configuration for Podcast Script Generator
+Configuration for Podcast Script Generator - NEW APPROACH
+Focus on framework extraction instead of chunking
 """
 
 import os
@@ -22,7 +23,7 @@ LOGS_DIR.mkdir(exist_ok=True)
 API_KEYS = {
     "google": os.getenv("GOOGLE_API_KEY"),
     "deepseek": os.getenv("DEEPSEEK_KEY"),
-    "google_tts" : os.getenv("GOOGLE_TTS_API_KEY"),
+    "google_tts": os.getenv("GOOGLE_TTS_API_KEY"),
 }
 
 API_CONFIG = {
@@ -33,21 +34,20 @@ API_CONFIG = {
     "timeout": 120
 }
 
-# Pipeline Configuration for Books
+# Pipeline Configuration - NEW APPROACH
 PIPELINE_CONFIG = {
-    "max_chapters": 20,        # Changed from max_concepts
-    "chunk_size": 3000,        # Larger chunks for books
-    "min_chunk_size": 1000,    # Larger minimum
-    "temperature": 0.85,
-    "max_tokens": 8192,
-    "section_word_target": 4000,  # Target 3000-5000 words per section
+    "max_passages": 12,        # Maximum key passages to extract (quotes, analogies, examples)
+    "max_examples": 8,         # Maximum supporting examples to extract
+    "temperature": 0.85,       # Generation temperature
+    "max_tokens": 8192,        # Max tokens per generation
+    "section_word_target": 4000,  # Target words per section (3000-5000 range)
 }
 
 # Default podcast metadata
 PODCAST_META = {
     "name": "My Podcast",
     "host": "Your Name",
-    "style": "conversational and engaging"
+    "style": "conversational and engaging, like Philosophize This"
 }
 
 # File encodings to try

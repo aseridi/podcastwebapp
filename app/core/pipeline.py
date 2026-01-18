@@ -1,6 +1,7 @@
 """
-Pipeline Orchestrator
+Pipeline Orchestrator - NEW APPROACH
 Coordinates the complete podcast script generation workflow
+Now focuses on framework extraction instead of chunking
 """
 
 import logging
@@ -38,19 +39,20 @@ class PodcastPipeline:
                 source: str,
                 podcast_name: str = "My Podcast",
                 host_name: str = "Host",
-                max_chapters: int = 20,  # Changed from max_concepts
+                max_passages: int = 12,
                 skip_elaborate: bool = False,
                 skip_polish: bool = False,
                 save_intermediate: bool = True) -> Dict[str, Any]:
         """
-        Run complete pipeline from book source to final script
+        Run complete pipeline from source to final script.
+        NEW: Focuses on framework extraction, not chunking.
 
         Args:
             source: File path, URL, or text content
             podcast_name: Name of the podcast
             host_name: Name of the host
-            max_chapters: Maximum number of chapters to analyze (changed from max_concepts)
-            skip_elaborate: Skip elaboration step
+            max_passages: Maximum number of key passages to extract (default 12)
+            skip_elaborate: Deprecated (kept for compatibility)
             skip_polish: Skip polishing step
             save_intermediate: Save analysis JSON
 
@@ -61,29 +63,39 @@ class PodcastPipeline:
         start_time = datetime.now()
 
         try:
-            # Step 1: Analyze content
-            log.info("Step 1/2: Analyzing book content...")
-            analysis = self.analyzer.process(source, max_chapters)
+            # Step 1: Analyze content (extract framework + passages)
+            log.info("Step 1/2: Analyzing philosophical framework...")
+            analysis = self.analyzer.process(source, max_passages)
 
             if not analysis:
                 return {
                     "success": False,
-                    "error": "Content analysis failed"
+                    "error": "Framework analysis failed"
                 }
 
+            # Log what we found
+            framework_name = analysis.get("framework", {}).get("framework_name", "Unknown")
+            num_passages = len(analysis.get("key_passages", []))
+            num_examples = len(analysis.get("supporting_examples", []))
+            num_sections = len(analysis.get("outline", []))
+            
+            log.info(f"Framework: {framework_name}")
+            log.info(f"Extracted: {num_passages} passages, {num_examples} examples, {num_sections} sections")
+
             # Save analysis if requested
+            analysis_file = None
             if save_intermediate:
                 analysis_file = self.output_dir / "json" / f"analysis_{start_time.strftime('%Y%m%d_%H%M%S')}.json"
                 analysis_file.write_text(json.dumps(analysis, indent=2))
                 log.info(f"Analysis saved to: {analysis_file}")
 
             # Step 2: Generate script
-            log.info("Step 2/2: Generating script...")
+            log.info("Step 2/2: Generating script from framework...")
             script = self.generator.generate_complete(
                 analysis,
                 podcast_name,
                 host_name,
-                skip_elaborate,
+                skip_elaborate,  # Ignored now, kept for compatibility
                 skip_polish
             )
 
@@ -113,12 +125,16 @@ class PodcastPipeline:
                     "duration_seconds": duration,
                     "script_length": len(script),
                     "word_count": len(script.split()),
-                    "num_chapters": len(analysis.get("ideas", [])),  # Changed to ideas
+                    "framework_name": framework_name,
+                    "num_passages": num_passages,
+                    "num_examples": num_examples,
+                    "num_sections": num_sections,
                     "timestamp": start_time.isoformat()
                 }
             }
 
             log.info(f"Pipeline completed in {duration:.1f} seconds")
+            log.info(f"Generated {len(script.split())} word script exploring: {framework_name}")
             return result
 
         except Exception as e:
